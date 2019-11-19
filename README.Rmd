@@ -1,11 +1,3 @@
----
-title: "AutobasisApp Readme"
-author: "Guillermo Reales"
-date: "19/11/2019"
-output: html_document
----
-
-  
 # Autobasis App
 #### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis  
 
