@@ -1,7 +1,7 @@
 ---
 #title: "AutobasisApp Readme"
 #author: "Guillermo Reales"
-#date: "19/11/2019"
+#date: "25/11/2019"
 output: rmarkdown::github_document
 ---
 

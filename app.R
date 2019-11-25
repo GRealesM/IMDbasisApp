@@ -2,6 +2,7 @@
 
 #### LOAD REQUIRED LIBRARIES AND SET REPOSITORIES ####
 library(shiny)
+library(shinyjs)
 library(BiocManager)
 options(repos = BiocManager::repositories())
 library(dplyr)
@@ -62,7 +63,7 @@ ui <- fluidPage(
           textInput("trait_name", "Trait name", "User trait"),
           sliderInput("PC", "Principal components (Scatter Plot)", 1, 13, c(1, 2), pre = "PC"),
           sliderInput("PCDelta", "Principal component (Delta Plot)", 1, 13, 1, pre = "PC"),
-          actionButton("startAnalysisButton",strong( "Start analysis"), style='background-color: #F1A8A8')
+          actionButton("startAnalysisButton",strong("Start analysis"), style='background-color: #F1A8A8')
         ),
         mainPanel(
           fluidRow(
@@ -85,9 +86,23 @@ server <- function(input, output, session) {
   # By default the file size limit is 5MB. Here limit is 70MB.
    options(shiny.maxRequestSize = 200*1024^2)
   
+  
+  ## Check helper
+  # checker <- reactiveValues(messageCheckDataText ="")
+  
   # Increase memory limit
   # memory.size(max = FALSE)
   observeEvent(input$startAnalysisButton, {
+    # shinyjs::disable("startAnalysisButton")
+    
+    # Check if an input was provided
+    # if (is.null(input$user_data)){
+    #   checker$messageCheckDataText<-"Error: Please provide a data set."
+    #   shinyjs::enable("startAnalysisButton")
+    #   return(NULL)
+    # }
+    
+    ### Transform initial slider values to reactives
     
     PCScatterplot <- reactive({
       paste("PC", input$PC, sep = "")
@@ -97,36 +112,73 @@ server <- function(input, output, session) {
       paste("PC", input$PCDelta, sep = "")
     })
     
+    ### DATA HANDLING ###
+    
+    ### Sanity Checks
+    ## Check if a dataset was uploaded
+          
+    
+    ## Check if there are missing columns
+      missing_cols <- function(x){
+      valid_headers <- c("CHR", "POS", "REF", "ALT", "SE", "P", "BETA")
+      if(!all(valid_headers %in% names(x))){
+        missing_cols <- valid_headers[!valid_headers %in% names(x)]
+        print("These column names seem to be missing: ", cat(valid_headers[!valid_headers %in% names(x)], sep = ", "), ". Please provide valid headers.")
+      }
+      else{
+        NULL
+      }
+    }
+    
+    ## Check if data was correctly aligned to SNP manifest
+    correct_alignment <- function(x){
+      if(any(g.class(x$alleles.manifest, x$alleles) != "nochange")){
+        "Some alleles do not match the SNP manifest file, this may be caused by data being in a different genome build, or by alleles needing some flipping. Please check."
+      }else{
+        NULL
+      }
+    }
+    
+    
+    
+    
+    ### Build the main data object
     M <- reactive({
-        uploaded_data <- fread(input$user_data$datapath)
-        names(uploaded_data) <- header_key[names(uploaded_data)]
-        # Check headers
-        if(!"BETA" %in% names(uploaded_data) && "OR" %in% names(uploaded_data)){
-           uploaded_data$BETA <- log(uploaded_data$OR)
-        }
-        valid_headers <- c("CHR", "POS", "REF", "ALT", "SE", "P", "BETA")
-        if(!all(valid_headers %in% names(uploaded_data))){
-          missing_cols <- valid_headers[!valid_headers %in% names(uploaded_data)]
-          stop("These column names seem to be missing: ", cat(valid_headers[!valid_headers %in% names(uploaded_data)], sep = ", "), ". Please provide valid headers.")
-        }
-        
-        # Add two columns to facilitate alignment
-        uploaded_data[,alleles:=paste(REF,ALT,sep="/")][,pid:=paste(CHR,POS,sep=":")]
-        SNP.manifest[,alleles:=paste(ref_a1,ref_a2,sep="/")]
-        
-        ## (2) ALIGN THE DATA TO SNP MANIFEST
-        
-        M <- merge(uploaded_data,SNP.manifest[,.(pid,alleles)], by='pid', suffixes=c("",".manifest"))
-        # SNP missing in user data
-        if(nrow(SNP.manifest) > nrow(M)) warning("There are ", nrow(SNP.manifest) - nrow(M), " less SNPs in data than in base. Please check.")
-        # NOT SURE ABOUT WHAT TO DO WHEN THIS DOES NOT EQUAL ZERO
-        
-        # Sanity check for alignment
-        if(any(g.class(M$alleles.manifest, M$alleles) != "nochange")){
-          ### EXTRA HARMONIZING STEPS. TO BE DEVELOPED
-          stop("Some alleles do not match the SNP manifest file, this may be caused by data being in a different genome build, or by alleles needing some flipping. Please check.")
-        }
-        return(M)
+      uploaded_data <- fread(input$user_data$datapath)
+      names(uploaded_data) <- header_key[names(uploaded_data)]
+      # Check headers
+      if(!"BETA" %in% names(uploaded_data) && "OR" %in% names(uploaded_data)){
+        uploaded_data$BETA <- log(uploaded_data$OR)
+      }
+      shiny::validate(
+        missing_cols(uploaded_data)
+      )
+      # valid_headers <- c("CHR", "POS", "REF", "ALT", "SE", "P", "BETA")
+      # if(!all(valid_headers %in% names(uploaded_data))){
+      #   missing_cols <- valid_headers[!valid_headers %in% names(uploaded_data)]
+      #   stop("These column names seem to be missing: ", cat(valid_headers[!valid_headers %in% names(uploaded_data)], sep = ", "), ". Please provide valid headers.")
+      # }
+      
+      # Add two columns to facilitate alignment
+      uploaded_data[,alleles:=paste(REF,ALT,sep="/")][,pid:=paste(CHR,POS,sep=":")]
+      SNP.manifest[,alleles:=paste(ref_a1,ref_a2,sep="/")]
+      
+      ## (2) ALIGN THE DATA TO SNP MANIFEST
+      
+      M <- merge(uploaded_data,SNP.manifest[,.(pid,alleles)], by='pid', suffixes=c("",".manifest"))
+      # SNP missing in user data
+      if(nrow(SNP.manifest) > nrow(M)) warning("There are ", nrow(SNP.manifest) - nrow(M), " less SNPs in data than in base. Please check.")
+      # NOT SURE ABOUT WHAT TO DO WHEN THIS DOES NOT EQUAL ZERO
+      
+      shiny::validate(
+        correct_alignment(M)
+      )
+      # # Sanity check for alignment
+      # if(any(g.class(M$alleles.manifest, M$alleles) != "nochange")){
+      #   ### EXTRA HARMONIZING STEPS. TO BE DEVELOPED
+      #   stop("Some alleles do not match the SNP manifest file, this may be caused by data being in a different genome build, or by alleles needing some flipping. Please check.")
+      # }
+      return(M)
     })
 
 
@@ -159,6 +211,14 @@ server <- function(input, output, session) {
   combined.deltaplot.dt[var.proj!=0,ci:=sqrt(var.proj) * 1.96]
 
   ## (4) GRAPHIC OUTPUT
+  
+  
+      # Error message in case no data is provided. Commented because it wasn't working
+      
+      # output$messageCheckData<-renderText(
+      #   print(checker$messageCheckDataText)
+      # )
+  
   
       ## PC table
   
