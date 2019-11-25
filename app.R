@@ -1,4 +1,4 @@
-#### Shiny-basis project #####
+  #### Shiny-basis project #####
 
 #### LOAD REQUIRED LIBRARIES AND SET REPOSITORIES ####
 library(shiny)
@@ -18,7 +18,7 @@ library(RColorBrewer)
 data(burren_imd_13_traits)
 
 ## Dummy input
-# input <- list(user_data = fread("EOC_Kanai_29403010.txt.gz"), trait_name = "EOC", PC=c(1,2), PCDelta = 1)
+# input <- list(user_data = fread("~/Desktop/EOC_Kanai_29403010.txt.gz"), trait_name = "EOC", PC=c(1,2), PCDelta = 1)
 
 SPARSE_BASIS_EXTDATA <- system.file("extdata/sparse_imd_basis", package="cupcake")
 SNP_MANIFEST_FILE <- file.path(SPARSE_BASIS_EXTDATA,'support/sparse_snp_manifest.RDS')
@@ -29,6 +29,7 @@ GWAS_DATA_DIR <- file.path(SPARSE_BASIS_EXTDATA,'/gwas_data/')
 basis.gwas.DT<-get_gwas_data(TRAIT_MANIFEST_FILE,SNP_MANIFEST_FILE,GWAS_DATA_DIR)
 basis <- readRDS(BASIS_FILE)
 shrink.DT <- readRDS(SHRINKAGE_FILE)
+
 # Header key
 header_key <- c(chr = "CHR",
                 pos = "POS",
@@ -65,12 +66,14 @@ ui <- fluidPage(
         ),
         mainPanel(
           fluidRow(
-            splitLayout(cellWidths = c("50%", "50%"), plotOutput("PCAScatterplot"), plotOutput("forest"))
+            splitLayout(cellWidths = c("50%", "50%"), plotOutput("PCAScatterplot"), plotOutput("delta"))
           ),
           fluidRow(
-              splitLayout(cellWidths = c("50%", "50%"), DTOutput("table"), plotOutput("delta"))
+            DTOutput("table")
+          ),
+          fluidRow(
+            downloadButton("downloadTable",label = "Download table")
           )
-          
         )
         )
 )
@@ -158,11 +161,36 @@ server <- function(input, output, session) {
   ## (4) GRAPHIC OUTPUT
   
       ## PC table
+  
       output$table <- DT::renderDataTable({
-      projected.userdata()
-      })
+      projected.userdata() %>% datatable(projected.userdata()) %>% 
+          formatRound(c("proj", "delta", "z"), digits = 4) %>% 
+          formatSignif(c("var.proj", "p.overall", "p", "p_adj"), digits = 4)
+      } #,options = list(
+          # rowCallback = JS(
+          #   "function(row, data) {",
+          #   "for (i = 1; i < data.length; i++) {",
+          #   "if (data[i]>1000 | data[i]<0.00001){",
+          #   "$('td:eq('+i+')', row).html(data[i].toExponential(1));",
+          #   "}",
+          #   "}",
+          #   "}"),
+          # pageLength = 13,
+          # autoWidth = TRUE,
+          # columnDefs = list(list(width = '100px', targets ="_all"))
+          # )
+        )
+      
+      # Download PC table
+      
+      output$downloadTable <- downloadHandler(
+        filename = c('PCDelta_table.csv'),
+        content = function(file) {
+          write.csv(projected.userdata(), file, row.names=FALSE)}
+      )
     
       ## PCA Scatterplot
+      
       output$PCAScatterplot <- renderPlot({
       scatterplot.dt <- data.table(traits = rownames(combined.pcs()), combined.pcs())
       xlim <- c(min(scatterplot.dt[, get(PCScatterplot()[1])]),max(scatterplot.dt[, get(PCScatterplot()[1])])) * 1.2
@@ -188,14 +216,13 @@ server <- function(input, output, session) {
         with(deltaplot.dt[idx,],arrows(delta-ci, idx, delta+ci, idx, length=0.05, angle=90, code=3,col='red'))
         abline(v=0,col='red',lty=2)
       })
+      
       ## Forest plot
+      
       output$forest <- renderPlot({
       combined.pcs() %>% dist %>% hclust %>% plot(., main = 'Forest Plot')
       })
   }) #ObserveEvent(button)
 }
-
-
-
 
 shinyApp(ui, server)
