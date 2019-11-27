@@ -18,6 +18,26 @@ Updated: 25/11/2019
 
 * In hg19/GRCh37 build.
 
-* First line must include, at least: CHR (Chromosome), POS (Base position), REF (Reference allele), ALT (Alternative, or effect allele), SE (Standard Error), P (P-value) and either OR (Odds Ratio) or BETA. If OR is provided, BETA will be calculated automatically.
+* First line must include, at least: 
+- CHR (Chromosome)
+- POS (Base position)
+- REF (Reference allele)
+- ALT (Alternative, or effect allele)
+- *either* OR (Odds Ratio) *or* BETA. If BETA is not provided, but OR is provided, BETA (log OR) will be calculated automatically.
+- SE (Standard Error of the log OR, BETA) 
+- P (P-value) and 
 
 * File max size: 200MB
+
+An example file is available here ...
+
+The header looks like 
+
+SNP_ID	CHR	POS	REF	ALT	BETA	SE	P
+rs11190140	10	101291593	T	C	-0.005272677	0.003586258	0.1415
+rs11195128	10	112186148	C	T	0.0003773544	0.003804623	0.921
+rs3814231	10	115481018	C	T	-0.009221944	0.004075314	0.02364
+
+Note that it is *essential* that your BETA is relative to the same alleles as in the original basis.  The example file gives the list of SNPs (defined by CHR and POS) and the REF and ALT alleles.
+
+We will reject any files that do not meet this requirement with a (hopefully informative) error message.  
