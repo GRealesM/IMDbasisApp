@@ -24,17 +24,15 @@ shrink.DT <- readRDS(SHRINKAGE_FILE)
 # This data set is publicly available at GWAS catalog (ftp://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics/AstleWJ_27863252_GCST004627/harmonised/27863252-GCST004627-EFO_0004587.h.tsv.gz)
 
 # We downloaded and renamed this file, so we can read it in R (It is a heavy file, so might not be open in a regular computer)
-input <- fread(input = "LYC_Astle_27863252.tsv.gz")
+input <- fread(input = "../../../Desktop/B004_Ahola-Olli_27989323_1-fc.tsv.gz")
 
 # This data set was harmonized by the GWAS catalog team, but since Basis is in hg19/GRCh37, we'll use the original part of the file, and only the relevant columns
-input <- input[, c(13:18, 21:23)]
-
-# The bp is in the first column, so some steps are required
-input$variant = as.character(lapply(strsplit(as.character(input$variant), split="_"), "[", 1))
-input$variant = as.character(lapply(strsplit(as.character(input$variant), split=":"), "[", 2))
+input <- input[, c(1:7, 9)]
+input$OtherAllele <- toupper(input$OtherAllele)
+input$EffectAllele <- toupper(input$EffectAllele)
 
 # Let's rename the columns to match the basis
-setnames(input, c("chromosome", "variant", "other_allele", "effect_allele", "p_value", "beta", "standard_error"),
+setnames(input, c("Chromosome", "Position", "OtherAllele", "EffectAllele", "P.value", "Effect", "StdErr"),
                 c("CHR", "POS", "REF", "ALT", "P", "BETA", "SE"))
 
 
@@ -45,13 +43,20 @@ SNP.manifest[,alleles:=paste(ref_a1,ref_a2,sep="/")]
 # Merged dataset
 M <- merge(input,SNP.manifest[,.(pid,alleles)], by='pid', suffixes=c("",".manifest"))
 
-# Check if everything is alright
+# Check if everything is alright  
 all(g.class(M$alleles.manifest, M$alleles)== "nochange")
 
+alleles_to_flip <- g.class(M$alleles.manifest, M$alleles) != "nochange"
+
+M$REF_2 <- M$REF
+M$REF[alleles_to_flip] <- M$ALT[alleles_to_flip]
+M$ALT[alleles_to_flip] <- M$REF_2[alleles_to_flip]
+M$BETA[alleles_to_flip] <- M$BETA[alleles_to_flip]*-1
+
 # Since everything is OK, let's make it a beautiful sample data set by removing some columns, renaming and reordering
-M[, c("pid", "base_pair_location", "alleles", "alleles.manifest") :=NULL]
-setnames(M, "variant_id", "SNP_ID")
+M[, c("pid", "alleles", "alleles.manifest", "REF_2") :=NULL]
+setnames(M, "MarkerName", "SNP_ID")
 setcolorder(M, c("SNP_ID","CHR","POS","REF" ,"ALT","BETA","SE","P"))
 
-write.table(M, file = "../00-Raw/Sample_dataset_LYC_Astle_27863252.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
+write.table(M, file = "data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv", sep = "\t", row.names = FALSE, quote = FALSE)
 

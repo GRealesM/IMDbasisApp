@@ -1,17 +1,3 @@
----
-#title: "AutobasisApp Readme"
-#author: "Guillermo Reales"
-#date: "25/11/2019"
-output: rmarkdown::github_document
----
-
-# Autobasis App
-#### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis  
-
-Updated: 03/12/2019
-
-**Note:** This is a beta version. Some important features and compatibility with some data formats and builds will be surely missing, but will be implemented in future versions
-
 ###  Purpose
 
 **AutobasisApp** is a **Shiny** web application that allows users to project their own GWAS summary statistics data onto a 13 Immune-mediated disease (IMD) basis.

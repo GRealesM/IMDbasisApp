@@ -6,13 +6,14 @@ library(shinyjs)
 library(BiocManager)
 options(repos = BiocManager::repositories())
 library(dplyr)
+library(knitr)
 library(R.utils)
 library(data.table)
 library(DT)
 library(cupcake)
 library(annotSnpStats) # on github.com/chr1swallace/annotSnpStats
 # library(cowplot)
-library(RColorBrewer)
+# library(RColorBrewer)
 # library(ggplot2)
 
 #### LOAD DATASETS ####
@@ -41,29 +42,55 @@ header_key <- c(chr = "CHR",
                 pval = "P",
                 p = "P")
 
-
-
 #### APP USER INTERFACE ####
 ui <- fluidPage(
 
-  headerPanel(title = "", windowTitle = "AutoBasisApp"),
+  headerPanel(title = "", windowTitle = "AutobasisApp"),
   wellPanel(
     titlePanel(
       fluidRow(
         column(10,
-               div("AutoBasisApp", style = "margin-left:10px;"),
+               div("AutobasisApp", style = "margin-left:10px;"),
                div("Shiny Web Application for projecting user GWAS data onto a 13 Immune-mediated traits Basis", style = "padding:10px; font-size:70%;"))
               ))),
-  sidebarLayout(
+      div(style="display: inline-block;vertical-align:middle;", actionButton("helpButton", strong("Help") )),
+  ###########################################################################
+  ###########################################################################
+  # STAGEHELP
+  ###########################################################################
+  ###########################################################################
+  
+  conditionalPanel(condition = "input.selectstage == 'stagehelp'",
+                   
+                   div(style="display: inline-block;vertical-align:middle;", h3("Help")),
+                   div(style="display: inline-block;vertical-align:middle;", h3(" ")),
+                   div(style="display: inline-block;vertical-align:middle;", actionButton("returnButton", icon = icon("reply"),label="")),
+                   fluidRow(column(12,HTML("<br>"))),
+                   
+                   tabsetPanel(
+                     tabPanel("About", column(12, includeMarkdown("about.md"))),
+                     
+                     textInput("selectstage", label="", value="stageuploaddata", width='300px') # For some reason this line is crucial for the whole app to work properly
+                   )),
+      h3(" "),
+
+    ###########################################################################
+    ###########################################################################
+    # STAGE OUTPUT
+    ###########################################################################
+    ###########################################################################
+        conditionalPanel(condition = "input.selectstage == 'stageuploaddata'",
+       
+        sidebarLayout(                 
         sidebarPanel(
           h3("Upload data"),
           helpText("Upload files in .txt, .csv, .tsv. Compressed files (e.g. .txt.gz) are also accepted"),
           fileInput("user_data", "", accept = c(".txt", ".csv", ".tsv", ".txt.gz", ".tsv.gz", ".csv.gz"), multiple = F),
           helpText("Provide the name of the trait you want to project onto the basis"),
-          textInput("trait_name", "Trait name", "User trait"),
+          textInput("trait_name", "Trait name", "IP-10"),
           sliderInput("PC", "Principal components (Scatter Plot)", 1, 13, c(1, 2), pre = "PC"),
           sliderInput("PCDelta", "Principal component (Delta Plot)", 1, 13, 1, pre = "PC"),
-          actionButton("startAnalysisButton",strong("Start analysis"), style='background-color: #F1A8A8')
+          # actionButton("startAnalysisButton",strong("Start analysis"), style='background-color: #F1A8A8')
         ),
         mainPanel(
           fluidRow(
@@ -76,41 +103,50 @@ ui <- fluidPage(
             downloadButton("downloadTable",label = "Download table")
           )
         )
-        )
+      )
+  )
 )
 
 #### SERVER SIDE CODE ####
 server <- function(input, output, session) {
   
+  
+  hide("selectstage")
+  
   ## (1) SANITY CHECKS ON INPUT FILE
-  # By default the file size limit is 5MB. Here limit is 70MB.
-   options(shiny.maxRequestSize = 200*1024^2)
+    # By default the file size limit is 5MB. Here limit is 70MB.
+      options(shiny.maxRequestSize = 200*1024^2)
   
+      
+    # Switch between different pannels
+      observeEvent(input$helpButton , {
+        rv$lastselectstage<-input$selectstage
+        updateTextInput(session, "selectstage", value = 'stagehelp')
+        toggle("helpButton")
+        
+      })
+      
+      observeEvent(input$returnButton , {
+        updateTextInput(session, "selectstage", value = rv$lastselectstage)
+        toggle("helpButton")
+        
+      })
   
-  ## Check helper
-  # checker <- reactiveValues(messageCheckDataText ="")
+      # Set reactive values
+      rv <- reactiveValues(
+        lastselectstage=NULL,
+        selectstage='stageuploaddata'
+      )
   
-  # Increase memory limit
-  # memory.size(max = FALSE)
-  observeEvent(input$startAnalysisButton, {
-    # shinyjs::disable("startAnalysisButton")
-    
-    # Check if an input was provided
-    # if (is.null(input$user_data)){
-    #   checker$messageCheckDataText<-"Error: Please provide a data set."
-    #   shinyjs::enable("startAnalysisButton")
-    #   return(NULL)
-    # }
-    
     ### Transform initial slider values to reactives
     
-    PCScatterplot <- reactive({
-      paste("PC", input$PC, sep = "")
-    })
-    
-    PCDelta <- reactive({
-      paste("PC", input$PCDelta, sep = "")
-    })
+      PCScatterplot <- reactive({
+        paste("PC", input$PC, sep = "")
+      })
+      
+      PCDelta <- reactive({
+        paste("PC", input$PCDelta, sep = "")
+      })
     
     ### DATA HANDLING ###
     
@@ -131,7 +167,7 @@ server <- function(input, output, session) {
     }
     
     ## Check if data was correctly aligned to SNP manifest
-    correct_alignment <- function(x){
+     correct_alignment <- function(x){
       if(any(g.class(x$alleles.manifest, x$alleles) != "nochange")){
         "Some alleles do not match the SNP manifest file, this may be caused by data being in a different genome build, or by alleles needing some flipping. Please check."
       }else{
@@ -139,12 +175,13 @@ server <- function(input, output, session) {
       }
     }
     
-    
-    
-    
     ### Build the main data object
-    M <- reactive({
-      uploaded_data <- fread(input$user_data$datapath)
+     M <- reactive({
+      if(is.null(input$user_data)){
+        uploaded_data <- fread("data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv")
+      } else {
+        uploaded_data <- fread(input$user_data$datapath)
+      }
       names(uploaded_data) <- header_key[names(uploaded_data)]
       # Check headers
       if(!"BETA" %in% names(uploaded_data) && "OR" %in% names(uploaded_data)){
@@ -186,8 +223,8 @@ server <- function(input, output, session) {
 
     projected.userdata <- reactive({
         projected.userdata <- cupcake::project_sparse(beta=M()$BETA, seb=M()$SE, pid=M()$pid)[,trait:=input$trait_name][]
-        projected.userdata[, p_adj := p.adjust(p, method = "bonferroni"),]
-        setcolorder(projected.userdata, c("PC", "proj", "var.proj", "delta", "p.overall", "z", "p", "p_adj", "trait"))
+  #      projected.userdata[, p_adj := p.adjust(p, method = "bonferroni"),]
+        setcolorder(projected.userdata, c("PC", "proj", "var.proj", "delta", "p.overall", "z", "p", "trait"))
         return(projected.userdata)
     })
   
@@ -202,87 +239,65 @@ server <- function(input, output, session) {
   # For Delta Plots, we'll calculate the significant PCs for the projected data
   # Then we'll need to project the basis traits onto the basis to characterize their PCs
   # Finally, we combine this data.table with the projected.userdata
-  basis.gwas.DT[,c('beta','seb'):=list(log(or),1) ]
-  basistable.projected <- lapply(split(basis.gwas.DT,basis.gwas.DT$trait),function(x){
-    tt <- x$trait %>% unique
-    cupcake::project_sparse(beta=x$beta,seb=x$seb,pids=x$pid)[,trait:=tt]
-  }) %>% rbindlist
-  combined.deltaplot.dt <- rbind(basistable.projected[,.(PC,delta,var.proj=0,trait)],projected.userdata()[,.(PC,delta,var.proj,trait)])
-  combined.deltaplot.dt[var.proj!=0,ci:=sqrt(var.proj) * 1.96]
+   combined.deltaplot.dt <- reactive({
+       basis.gwas.DT[,c('beta','seb'):=list(log(or),1) ]
+       basistable.projected <- lapply(split(basis.gwas.DT,basis.gwas.DT$trait),function(x){
+         tt <- x$trait %>% unique
+         cupcake::project_sparse(beta=x$beta,seb=x$seb,pids=x$pid)[,trait:=tt]
+       }) %>% rbindlist
+       combined.deltaplot.dt <- rbind(basistable.projected[,.(PC,delta,var.proj=0,trait)],projected.userdata()[,.(PC,delta,var.proj,trait)])
+       combined.deltaplot.dt[var.proj!=0, ci:=sqrt(var.proj) * 1.96]
+       return(combined.deltaplot.dt)
+   })
+
 
   ## (4) GRAPHIC OUTPUT
   
-  
       # Error message in case no data is provided. Commented because it wasn't working
       
-      # output$messageCheckData<-renderText(
-      #   print(checker$messageCheckDataText)
-      # )
-  
-  
       ## PC table
-  
       output$table <- DT::renderDataTable({
-      projected.userdata() %>% datatable(projected.userdata()) %>% 
+          projected.userdata() %>% datatable(projected.userdata()) %>% 
           formatRound(c("proj", "delta", "z"), digits = 4) %>% 
-          formatSignif(c("var.proj", "p.overall", "p", "p_adj"), digits = 4)
-      } #,options = list(
-          # rowCallback = JS(
-          #   "function(row, data) {",
-          #   "for (i = 1; i < data.length; i++) {",
-          #   "if (data[i]>1000 | data[i]<0.00001){",
-          #   "$('td:eq('+i+')', row).html(data[i].toExponential(1));",
-          #   "}",
-          #   "}",
-          #   "}"),
-          # pageLength = 13,
-          # autoWidth = TRUE,
-          # columnDefs = list(list(width = '100px', targets ="_all"))
-          # )
+          formatSignif(c("var.proj", "p.overall", "p"), digits = 4)
+      }
         )
       
       # Download PC table
       
       output$downloadTable <- downloadHandler(
-        filename = c('PCDelta_table.csv'),
-        content = function(file) {
+          filename = c('PCDelta_table.csv'),
+          content = function(file) {
           write.csv(projected.userdata(), file, row.names=FALSE)}
       )
     
       ## PCA Scatterplot
       
       output$PCAScatterplot <- renderPlot({
-      scatterplot.dt <- data.table(traits = rownames(combined.pcs()), combined.pcs())
-      xlim <- c(min(scatterplot.dt[, get(PCScatterplot()[1])]),max(scatterplot.dt[, get(PCScatterplot()[1])])) * 1.2
-      ylim <- c(min(scatterplot.dt[, get(PCScatterplot()[2])]),max(scatterplot.dt[, get(PCScatterplot()[2])])) * 1.2
-      cols <- rep('black', nrow(scatterplot.dt))
-      cols[scatterplot.dt$traits == input$trait_name] <- 'red'
-      plot(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],type='n',xlim=xlim,ylim=ylim,main="PCA scatterplot", 
-           xlab = PCScatterplot()[1], ylab = PCScatterplot()[2], col=cols)
-      text(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],labels=scatterplot.dt$traits, cex= 0.8, adj=c(0,0), col=cols)
-      points(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],cex=0.5,pch=19, col=cols)
+          scatterplot.dt <- data.table(traits = rownames(combined.pcs()), combined.pcs())
+          xlim <- c(min(scatterplot.dt[, get(PCScatterplot()[1])]),max(scatterplot.dt[, get(PCScatterplot()[1])])) * 1.2
+          ylim <- c(min(scatterplot.dt[, get(PCScatterplot()[2])]),max(scatterplot.dt[, get(PCScatterplot()[2])])) * 1.2
+          cols <- rep('black', nrow(scatterplot.dt))
+          cols[scatterplot.dt$traits == input$trait_name] <- 'red'
+          plot(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],type='n',xlim=xlim,ylim=ylim,main="PCA scatterplot", 
+               xlab = PCScatterplot()[1], ylab = PCScatterplot()[2], col=cols)
+          text(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],labels=scatterplot.dt$traits, cex= 0.8, adj=c(0,0), col=cols)
+          points(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],cex=0.5,pch=19, col=cols)
       })
       
       ## Delta plot
       
       output$delta <- renderPlot({
-        deltaplot.dt <- combined.deltaplot.dt[PC==PCDelta(),][order(delta,decreasing = TRUE),]
-        idx <- which(!is.na(deltaplot.dt$ci))
-        cols <- rep('black',nrow(deltaplot.dt))
-        cols[idx] <- 'red'
-        dotchart(deltaplot.dt$delta,labels=deltaplot.dt$trait,xlim=c(-0.1,0.05),pch=19, main=paste("Delta Plot", PCDelta()),xlab="Delta PC score",
-                                       col=cols)
-          ## add 95% confidence intervals
-        with(deltaplot.dt[idx,],arrows(delta-ci, idx, delta+ci, idx, length=0.05, angle=90, code=3,col='red'))
-        abline(v=0,col='red',lty=2)
+          deltaplot.dt <- combined.deltaplot.dt()[PC==PCDelta(),][order(delta,decreasing = TRUE),]
+          idx <- which(!is.na(deltaplot.dt$ci))
+          cols <- rep('black',nrow(deltaplot.dt))
+          cols[idx] <- 'red'
+          dotchart(deltaplot.dt$delta,labels=deltaplot.dt$trait,xlim=c(-0.1,0.05),pch=19, main=paste("Delta Plot", PCDelta()),xlab="Delta PC score",
+                                         col=cols)
+            ## add 95% confidence intervals
+          with(deltaplot.dt[idx,],arrows(delta-ci, idx, delta+ci, idx, length=0.05, angle=90, code=3,col='red'))
+          abline(v=0,col='red',lty=2)
       })
-      
-      ## Forest plot
-      
-      output$forest <- renderPlot({
-      combined.pcs() %>% dist %>% hclust %>% plot(., main = 'Forest Plot')
-      })
-  }) #ObserveEvent(button)
 }
 
 shinyApp(ui, server)

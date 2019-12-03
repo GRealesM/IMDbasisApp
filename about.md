@@ -1,17 +1,3 @@
----
-#title: "AutobasisApp Readme"
-#author: "Guillermo Reales"
-#date: "25/11/2019"
-output: rmarkdown::github_document
----
-
-# Autobasis App
-#### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis  
-
-Updated: 03/12/2019
-
-**Note:** This is a beta version. Some important features and compatibility with some data formats and builds will be surely missing, but will be implemented in future versions
-
 ###  Purpose
 
 **AutobasisApp** is a **Shiny** web application that allows users to project their own GWAS summary statistics data onto a 13 Immune-mediated disease (IMD) basis.
@@ -41,18 +27,10 @@ In order to analyze your own data, you must provide a GWAS summary statistics fi
 If OR is provided, BETA will be calculated automatically.
   
   
-### Example file
+### Sample file
 
 We included a filtered dataset that serves as a default dataset to showcase what should be expected when inputting your own data.
 This dataset correspond to a GWAS of C-X-C motif chemokine 10, Interferon gamma-induced protein 10 (CXCL10, IP-10) levels, published by Aholla-Olli et al., 2017 ([10.1016/j.ajhg.2016.11.007](https://doi.org/10.1016/j.ajhg.2016.11.007)), and publicly available at [GWAS Catalogue](http://computationalmedicine.fi/data#Cytokine_GWAS).
-
-This is an example of dataset format that *should* work:
-
-```{r, eval=TRUE, echo=FALSE}
-sample_dataset <- data.table::fread("data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv")
-table <- head(sample_dataset)
-knitr::kable(table)
-```
 
 **Note** that it is *essential* that your BETA is relative to the same alleles as in the original basis.  The example file gives the list of SNPs (defined by CHR and POS) and the REF and ALT alleles.
 
