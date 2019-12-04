@@ -3,7 +3,7 @@
 
 #### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis
 
-Updated: 03/12/2019
+Updated: 04/12/2019
 
 **Note:** This is a beta version. Some important features and
 compatibility with some data formats and builds will be surely missing,
@@ -84,20 +84,19 @@ message.
 dependent on the following software and **R**
 packages:
 
-|                |                                                                                                                                                                    |
-| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Software**   |                                                                                                                                                                    |
-| R              | Language and environment for statistical computing and graphics                                                                                                    |
-| **R packages** |                                                                                                                                                                    |
-| annotSnpStats  | Simple class to allow SnpMatrix objects to be manipulated together with SNP annotation files. Available at [Github](https://github.com/chr1swallace/annotSnpStats) |
-| BiocManager    | Provides tools for managing Bioconductor’s package versioning and release system. Dependency of cupcake/annotSnpStats                                              |
-| cupcake        | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake)                       |
-| data.table     | Fast aggregation of large data, among other functions                                                                                                              |
-| DT             | A Wrapper of the JavaScript Library ‘DataTables’. It helps rendering the PCA table for visualization                                                               |
-| dplyr          | A fast, consistent tool for working with data frame like objects, both in memory and out of memory                                                                 |
-| knitr          | Tool for dynamic report generation in R                                                                                                                            |
-| R.utils        | Utility functions useful when programming and developing R packages, dependency of cupcake and/or annotSnpStats packages                                           |
-| shiny          | Web Application Framework for R                                                                                                                                    |
+|                |                                                                                                                                              |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Software**   |                                                                                                                                              |
+| R              | Language and environment for statistical computing and graphics                                                                              |
+| **R packages** |                                                                                                                                              |
+| BiocManager    | Provides tools for managing Bioconductor’s package versioning and release system. Dependency of cupcake/annotSnpStats                        |
+| cupcake        | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake) |
+| data.table     | Fast aggregation of large data, among other functions                                                                                        |
+| DT             | A Wrapper of the JavaScript Library ‘DataTables’. It helps rendering the PCA table for visualization                                         |
+| dplyr          | A fast, consistent tool for working with data frame like objects, both in memory and out of memory                                           |
+| knitr          | Tool for dynamic report generation in R                                                                                                      |
+| R.utils        | Utility functions useful when programming and developing R packages, dependency of cupcake and/or annotSnpStats packages                     |
+| shiny          | Web Application Framework for R                                                                                                              |
 
 ### Citation
 
@@ -107,15 +106,17 @@ To cite **AutobasisApp** in publications, please use:
     immune mediated disease through informed dimension reduction allows
     the separation of clinical subtypes” *Manuscript in preparation*
 
-### Developer
+### Development
 
-**AutobasisApp** has been developed by
+**AutobasisApp** has been developed within the [**Wallace
+Group**](https://chr1swallace.github.io) and funded by the **Wellcome
+Trust**.
 
-Guillermo Reales
-
+Guillermo Reales  
+Posdoctoral Associate at Wallace Group  
 Department of Medicine  
 University of Cambridge  
 Cambridge, CB2 0AW, United Kingdom  
 E-mail: <gr440@cam.ac.uk>  
-URL: <http://github.com/GRealesM>  
+URL: <https://chr1swallace.github.io>; <http://github.com/GRealesM>  
 Twitter: @GReales7

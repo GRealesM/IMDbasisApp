@@ -46,8 +46,7 @@ We will reject any files that do not meet this requirement with an error message
 **Software**   | 
 R  | Language and environment for statistical computing and graphics
 **R packages** |
-annotSnpStats | Simple class to allow SnpMatrix objects to be manipulated together with SNP annotation files. Available at [Github](https://github.com/chr1swallace/annotSnpStats)
-BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake/annotSnpStats
+BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake.
 cupcake | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake)
 data.table | Fast aggregation of large data, among other functions
 DT | A Wrapper of the JavaScript Library 'DataTables'. It helps rendering the PCA table for visualization
@@ -59,20 +58,20 @@ shiny  | Web Application Framework for R
 
 ### Citation
 
-To cite **AutobasisApp** in publications, please use:
+**AutobasisApp** comes as a companion for the paper referenced below. To cite the app in publications, please use:
 
-- Burren O (2020) "Characterisation of the genetic architecture of immune mediated disease through informed dimension reduction allows the separation of clinical subtypes" *Manuscript in preparation*
+- Burren O et al. (2020) "Characterisation of the genetic architecture of immune mediated disease through informed dimension reduction allows the separation of clinical subtypes" *Manuscript in preparation*
 
 
-### Developer
+### Development
 
-**AutobasisApp** has been developed by
+**AutobasisApp** has been developed within the [**Wallace Group**](https://chr1swallace.github.io) and funded by the **Wellcome Trust**.  
 
-Guillermo Reales 
-
+Guillermo Reales  
+Posdoctoral Associate at Wallace Group  
 Department of Medicine  
 University of Cambridge  
 Cambridge, CB2 0AW, United Kingdom  
 E-mail: gr440@cam.ac.uk  
-URL: http://github.com/GRealesM  
+URL: https://chr1swallace.github.io; http://github.com/GRealesM  
 Twitter: @GReales7  
