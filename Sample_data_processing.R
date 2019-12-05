@@ -20,7 +20,7 @@ basis.gwas.DT<-get_gwas_data(TRAIT_MANIFEST_FILE,SNP_MANIFEST_FILE,GWAS_DATA_DIR
 basis <- readRDS(BASIS_FILE)
 shrink.DT <- readRDS(SHRINKAGE_FILE)
 
-# Initially, we'll use one of the summary statistics file from Astle et al., 2016 (27863252) data, corresponding to a GWAS of Lymphocyte levels in Europeans.
+# Initially, we'll use one of the summary statistics file from Ahola-Olli, 2016 (27989323) data, corresponding to a GWAS of IP-10 levels in a Finnish population.
 # This data set is publicly available at GWAS catalog (ftp://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics/AstleWJ_27863252_GCST004627/harmonised/27863252-GCST004627-EFO_0004587.h.tsv.gz)
 
 # We downloaded and renamed this file, so we can read it in R (It is a heavy file, so might not be open in a regular computer)
