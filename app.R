@@ -96,14 +96,20 @@ ui <- fluidPage(
             ),
             mainPanel(
               fluidRow(
-                splitLayout(cellWidths = c("50%", "50%"), plotOutput("PCAScatterplot"), plotOutput("delta"))
+                column(9, align = "center", offset = 1,
+                       plotOutput("delta"))
               ),
               fluidRow(
+                h4("Quality Control"),
+                tableOutput("QCtable")
+              ),
+              fluidRow(
+                h4("Projected data results"),
                 tableOutput("table")
               ),
               fluidRow(
-                downloadButton("downloadTable",label = "Download table"),
-                tableOutput("QCtable")
+                downloadButton("downloadTable",label = "Download table")
+                
               )
             )
           )
@@ -316,7 +322,7 @@ server <- function(input, output, session) {
     values <- c(SNP_overlap, SNP_overlap_percentage, overall_p)
     QCTable <- data.frame(vars, values)
     QCTable
-  }, colnames = FALSE)
+  }, width = "50%", colnames = FALSE)
   
   ### Display PCA Scatterplot
   output$PCAScatterplot <- renderPlot({
