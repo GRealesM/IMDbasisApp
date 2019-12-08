@@ -56,7 +56,6 @@ ui <- fluidPage(
                div("AutobasisApp", style = "margin-left:10px;"),
                div("Shiny Web Application for projecting user GWAS data onto a 13 Immune-mediated traits Basis", style = "padding:10px; font-size:70%;"))
               ))),
-      div(style="display: inline-block;vertical-align:middle;", actionButton("helpButton", strong("Help") )),
 
   
 ###########################################################################
@@ -82,6 +81,8 @@ ui <- fluidPage(
 ###########################################################################
   
         conditionalPanel(condition = "input.selectstage == 'stageuploaddata'",
+            div(style="display: inline-block;vertical-align:middle;", actionButton("helpButton", strong("Help") )),
+            h2(""),
             sidebarLayout(                 
             sidebarPanel(
               h3("Upload data"),
@@ -98,10 +99,11 @@ ui <- fluidPage(
                 splitLayout(cellWidths = c("50%", "50%"), plotOutput("PCAScatterplot"), plotOutput("delta"))
               ),
               fluidRow(
-                DTOutput("table")
+                tableOutput("table")
               ),
               fluidRow(
-                downloadButton("downloadTable",label = "Download table")
+                downloadButton("downloadTable",label = "Download table"),
+                tableOutput("QCtable")
               )
             )
           )
@@ -233,8 +235,8 @@ server <- function(input, output, session) {
       
       M <- merge(uploaded_data,SNP.manifest[,.(pid,alleles)], by='pid', suffixes=c("",".manifest"))
       # SNP missing in user data
-      if(nrow(SNP.manifest) > nrow(M)) warning("There are ", nrow(SNP.manifest) - nrow(M), " less SNPs in data than in base. Please check.")
-      # NOT SURE ABOUT WHAT TO DO WHEN THIS DOES NOT EQUAL ZERO
+      # if(nrow(SNP.manifest) > nrow(M)) warning("There are ", nrow(SNP.manifest) - nrow(M), " less SNPs in data than in base. Please check.")
+      # # NOT SURE ABOUT WHAT TO DO WHEN THIS DOES NOT EQUAL ZERO
       
       shiny::validate(
         correct_alignment(M)
@@ -276,53 +278,72 @@ server <- function(input, output, session) {
        combined.deltaplot.dt[var.delta!=0, ci:=sqrt(var.delta) * 1.96]
        return(combined.deltaplot.dt)
    })
+   
+   # Prepare full table for download  
 
 ###########################################################################
 # Graphic Output
 ###########################################################################
 
 
-      ### Display PC table
-      output$table <- DT::renderDataTable({
-          projected.userdata() %>% datatable(projected.userdata()) %>% 
-          formatRound(c("delta", "z"), digits = 4) %>% # Removed proj from here
-          formatSignif(c("var.delta", "p.overall", "p"), digits = 4) # Changed var.proj to var.delta
-      }
-        )
-      
-      ### Download PC table
-      output$downloadTable <- downloadHandler(
-          filename = c('PCDelta_table.csv'),
-          content = function(file) {
-          write.csv(projected.userdata(), file, row.names=FALSE)}
-      )
-    
-      ### Display PCA Scatterplot
-      output$PCAScatterplot <- renderPlot({
-          scatterplot.dt <- data.table(traits = rownames(combined.pcs()), combined.pcs())
-          xlim <- c(min(scatterplot.dt[, get(PCScatterplot()[1])]),max(scatterplot.dt[, get(PCScatterplot()[1])])) * 1.2
-          ylim <- c(min(scatterplot.dt[, get(PCScatterplot()[2])]),max(scatterplot.dt[, get(PCScatterplot()[2])])) * 1.2
-          cols <- rep('black', nrow(scatterplot.dt))
-          cols[scatterplot.dt$traits == input$trait_name] <- 'red'
-          plot(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],type='n',xlim=xlim,ylim=ylim,main="PCA scatterplot", 
-               xlab = PCScatterplot()[1], ylab = PCScatterplot()[2], col=cols)
-          abline(h=0, v=0, col="red", lty = 2, lwd = 1)
-          text(scatterplot.dt[, get(PCScatterplot()[1])], scatterplot.dt[, get(PCScatterplot()[2])],labels=scatterplot.dt$traits, cex= 0.8, adj=c(0,0), col=cols)
-          points(scatterplot.dt[, get(PCScatterplot()[1])], scatterplot.dt[, get(PCScatterplot()[2])],cex=0.5,pch=19, col=cols)
-      })
-      
-      ### Display Delta plot
-      output$delta <- renderPlot({
-          deltaplot.dt <- combined.deltaplot.dt()[PC==PCDelta(),][order(delta,decreasing = TRUE),]
-          idx <- which(!is.na(deltaplot.dt$ci))
-          cols <- rep('black',nrow(deltaplot.dt))
-          cols[idx] <- 'red'
-          dotchart(deltaplot.dt$delta,labels=deltaplot.dt$trait,xlim=c(-0.1,0.05),pch=19, main=paste("Delta Plot", PCDelta()),xlab="Delta PC score",
-                                         col=cols)
-            ## add 95% confidence intervals
-          with(deltaplot.dt[idx,],arrows(delta-ci, idx, delta+ci, idx, length=0.05, angle=90, code=3,col='red'))
-          abline(v=0,col='red',lty=2)
-      })
+  ### Display PC table
+  output$table <- renderTable({
+      table_display <- data.frame(PC = projected.userdata()$PC, Var.Delta = projected.userdata()$var.delta, Delta = projected.userdata()$delta, P = projected.userdata()$p, trait = projected.userdata()$trait, stringsAsFactors = F) %>% arrange(P)
+      table_display$Var.Delta <- sprintf("%.4e", table_display$Var.Delta)
+      table_display$Delta <- sprintf("%.4e", table_display$Delta)
+      table_display$P <- sprintf("%.2e", table_display$P)
+      table_display
+    ## This is used for the DT output, currently commented
+    # %>% datatable(projected.userdata()) %>% 
+    #   formatRound(c("delta", "z"), digits = 4) %>% # Removed proj from here
+    #   formatSignif(c("var.delta", "p.overall", "p"), digits = 4) # Changed var.proj to var.delta
+    ##########
+  }, width = '100%'
+    )
+  
+  ### Download PC table
+  output$downloadTable <- downloadHandler(
+      filename = c('PCDelta_table.csv'),
+      content = function(file) {
+      write.csv(projected.userdata(), file, row.names=FALSE)}
+  )
+  ### Display QC table
+  output$QCtable <- renderTable({
+    vars <- c("Data v. Manifest overlapping SNPs", "Data v. Manifest overlapping SNPs (%)", "Overall P-value")
+    SNP_overlap <- sprintf("%d",nrow(M()))
+    SNP_overlap_percentage <- sprintf("%.2f",(nrow(M())/nrow(SNP.manifest))*100)
+    overall_p <- sprintf("%7.2e",projected.userdata()$p.overall[1])
+    values <- c(SNP_overlap, SNP_overlap_percentage, overall_p)
+    QCTable <- data.frame(vars, values)
+    QCTable
+  }, colnames = FALSE)
+  
+  ### Display PCA Scatterplot
+  output$PCAScatterplot <- renderPlot({
+      scatterplot.dt <- data.table(traits = rownames(combined.pcs()), combined.pcs())
+      xlim <- c(min(scatterplot.dt[, get(PCScatterplot()[1])]),max(scatterplot.dt[, get(PCScatterplot()[1])])) * 1.2
+      ylim <- c(min(scatterplot.dt[, get(PCScatterplot()[2])]),max(scatterplot.dt[, get(PCScatterplot()[2])])) * 1.2
+      cols <- rep('black', nrow(scatterplot.dt))
+      cols[scatterplot.dt$traits == input$trait_name] <- 'red'
+      plot(scatterplot.dt[, get(PCScatterplot()[1])],scatterplot.dt[, get(PCScatterplot()[2])],type='n',xlim=xlim,ylim=ylim,main="PCA scatterplot", 
+           xlab = PCScatterplot()[1], ylab = PCScatterplot()[2], col=cols)
+      abline(h=0, v=0, col="red", lty = 2, lwd = 1)
+      text(scatterplot.dt[, get(PCScatterplot()[1])], scatterplot.dt[, get(PCScatterplot()[2])],labels=scatterplot.dt$traits, cex= 0.8, adj=c(0,0), col=cols)
+      points(scatterplot.dt[, get(PCScatterplot()[1])], scatterplot.dt[, get(PCScatterplot()[2])],cex=0.5,pch=19, col=cols)
+  })
+  
+  ### Display Delta plot
+  output$delta <- renderPlot({
+      deltaplot.dt <- combined.deltaplot.dt()[PC==PCDelta(),][order(delta,decreasing = TRUE),]
+      idx <- which(!is.na(deltaplot.dt$ci))
+      cols <- rep('black',nrow(deltaplot.dt))
+      cols[idx] <- 'red'
+      dotchart(deltaplot.dt$delta,labels=deltaplot.dt$trait,xlim=c(-0.1,0.05),pch=19, main=paste("Delta Plot", PCDelta()),xlab="Delta PC score",
+                                     col=cols)
+        ## add 95% confidence intervals
+      with(deltaplot.dt[idx,],arrows(delta-ci, idx, delta+ci, idx, length=0.05, angle=90, code=3,col='red'))
+      abline(v=0,col='red',lty=2)
+  })
 }
 
 shinyApp(ui, server)

@@ -30,7 +30,7 @@ If OR is provided, BETA will be calculated automatically.
 ### Sample file
 
 We included a filtered dataset that serves as a default dataset to showcase what should be expected when inputting your own data.
-This dataset correspond to a GWAS of C-X-C motif chemokine 10, Interferon gamma-induced protein 10 (CXCL10, IP-10) levels, published by Aholla-Olli et al., 2017 ([10.1016/j.ajhg.2016.11.007](https://doi.org/10.1016/j.ajhg.2016.11.007)), and publicly available at [GWAS Catalogue](http://computationalmedicine.fi/data#Cytokine_GWAS).
+This dataset correspond to a GWAS of C-X-C motif chemokine 10, Interferon gamma-induced protein 10 (CXCL10, IP-10) levels, published by Ahola-Olli et al., 2017 ([10.1016/j.ajhg.2016.11.007](https://doi.org/10.1016/j.ajhg.2016.11.007)), and publicly available at [GWAS Catalog](ftp://ftp.ebi.ac.uk/pub/databases/gwas/summary_statistics/Ahola-OlliAV_27989323_GCST004440/IP10.data.gz).
 
 **Note** that it is *essential* that your BETA is relative to the same alleles as in the original basis.  The example file gives the list of SNPs (defined by CHR and POS) and the REF and ALT alleles.
 
