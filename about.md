@@ -25,7 +25,8 @@ In order to analyze your own data, you must provide a GWAS summary statistics fi
     - **P** (P-value)
       
 If OR is provided, BETA will be calculated automatically.
-  
+
+- Maximum size **200MB**.
   
 ### Sample file
 
