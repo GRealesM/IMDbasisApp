@@ -89,9 +89,7 @@ ui <- fluidPage(
               fileInput("user_data", "", accept = c(".txt", ".csv", ".tsv", ".txt.gz", ".tsv.gz", ".csv.gz"), multiple = F),
               helpText("Provide the name of the trait you want to project onto the basis"),
               textInput("trait_name", "Trait name", "IP-10"),
-              sliderInput("PC", "Principal components (Scatter Plot)", 1, 13, c(1, 2), pre = "PC"),
-              sliderInput("PCDelta", "Principal component (Delta Plot)", 1, 13, 1, pre = "PC"),
-              # actionButton("startAnalysisButton",strong("Start analysis"), style='background-color: #F1A8A8')
+              sliderInput("PCDelta", "Principal component (Delta Plot)", 1, 13, 1, pre = "PC")
             ),
             mainPanel(
               fluidRow(
@@ -99,7 +97,7 @@ ui <- fluidPage(
                        plotOutput("delta"))
               ),
               fluidRow(
-                downloadButton("downloadDelta",label = "Download Delta Plot")
+                downloadButton(outputId = "downloadDelta",label = "Download Delta Plot")
               ),
               fluidRow(
                 h4("Quality Control"),
@@ -110,7 +108,10 @@ ui <- fluidPage(
                 tableOutput("table")
               ),
               fluidRow(
-                downloadButton("downloadTable",label = "Download table")
+                  checkboxInput(inputId = "downloadfulldata", label = "I want full results", value = FALSE)
+              ),
+              fluidRow(
+                downloadButton(outputId = "downloadTable",label = "Download table")
                 
               )
             )
@@ -259,14 +260,14 @@ server <- function(input, output, session) {
     projected.userdata <- reactive({
         projected.userdata <- cupcake::project_sparse(beta=M()$BETA, seb=M()$SE, pid=M()$pid)[,trait:=input$trait_name][]
         projected.userdata[, proj:=NULL] # Removed proj variable
-        setnames(projected.userdata, "var.proj", "var.delta") # Changed var.proj to var.delta
-        setcolorder(projected.userdata, c("PC", "var.delta", "delta", "p.overall", "z", "p", "trait")) # Removed Proj from here too
+        setnames(projected.userdata, c("var.proj", "delta", "p", "trait"), c("Var.Delta", "Delta", "P", "Trait")) # Changed var.proj to var.delta
+        setcolorder(projected.userdata, c("PC", "Var.Delta", "Delta", "p.overall", "z", "P", "Trait")) # Removed Proj from here too
         return(projected.userdata)
     })
   
   # We extract the projected PCs and combine them with basis PC matrix, so we have a PC matrix that we can use for plotting
     combined.pcs <- reactive({
-        userdata.pcs <- projected.userdata()$delta # Replaced proj by delta!
+        userdata.pcs <- projected.userdata()$Delta # Replaced proj by delta!
         combined.pcs <- rbind(userdata.pcs, basis$x[,1:13])
         rownames(combined.pcs)[1] <- input$trait_name
         return(combined.pcs)
@@ -281,27 +282,36 @@ server <- function(input, output, session) {
          tt <- x$trait %>% unique
          cupcake::project_sparse(beta=x$beta,seb=x$seb,pids=x$pid)[,trait:=tt]
        }) %>% rbindlist
-       setnames(basistable.projected, "var.proj", "var.delta")
-       combined.deltaplot.dt <- rbind(basistable.projected[,.(PC,delta,var.delta=0,trait)],projected.userdata()[,.(PC,delta,var.delta,trait)])
-       combined.deltaplot.dt[var.delta!=0, ci:=sqrt(var.delta) * 1.96]
+       setnames(basistable.projected, c("var.proj", "delta", "trait"), c("Var.Delta", "Delta", "Trait"))
+       combined.deltaplot.dt <- rbind(basistable.projected[,.(PC,Delta,Var.Delta=0,Trait)],projected.userdata()[,.(PC,Delta,Var.Delta,Trait)])
+       combined.deltaplot.dt[Var.Delta!=0, ci:=sqrt(Var.Delta) * 1.96]
        return(combined.deltaplot.dt)
    })
    
-   # Prepare full table for download  
-   
+
    # Prepare delta plot
    deltaplot.dt <- reactive({
-     deltaplot.dt <- combined.deltaplot.dt()[PC==PCDelta(),][order(delta,decreasing = TRUE),]
+     deltaplot.dt <- combined.deltaplot.dt()[PC==PCDelta(),][order(Delta,decreasing = TRUE),]
      idx <- which(!is.na(deltaplot.dt$ci))
      cols <- rep('black',nrow(deltaplot.dt))
      cols[idx] <- 'red'
-     dotchart(deltaplot.dt$delta,labels=deltaplot.dt$trait,xlim=c(-0.1,0.05),pch=19, main=paste("Delta Plot", PCDelta()),xlab="Delta PC score",
+     dotchart(deltaplot.dt$Delta,labels=deltaplot.dt$Trait,xlim=c(-0.1,0.05),pch=19, main=paste("Delta Plot", PCDelta()),xlab="Delta PC score",
               col=cols)
      ## add 95% confidence intervals
-     with(deltaplot.dt[idx,],arrows(delta-ci, idx, delta+ci, idx, length=0.05, angle=90, code=3,col='red'))
+     with(deltaplot.dt[idx,],arrows(Delta-ci, idx, Delta+ci, idx, length=0.05, angle=90, code=3,col='red'))
      abline(v=0,col='red',lty=2)
    })
 
+   # Prepare full table for download  
+   ## Full dataset
+   full_data <- reactive({
+    full_data <- merge(projected.userdata()[, c("PC","P", "Trait")], combined.deltaplot.dt(), by = c("PC","Trait"), all.y = TRUE)
+    setcolorder(full_data, c("PC", "Trait", "Delta", "Var.Delta", "P"))
+    setorder(full_data, "Trait")
+   })
+   
+   
+   
 ###########################################################################
 # Graphic Output
 ###########################################################################
@@ -309,16 +319,11 @@ server <- function(input, output, session) {
 
   ### Display PC table
   output$table <- renderTable({
-      table_display <- data.frame(PC = projected.userdata()$PC, Var.Delta = projected.userdata()$var.delta, Delta = projected.userdata()$delta, P = projected.userdata()$p, trait = projected.userdata()$trait, stringsAsFactors = F) %>% arrange(P)
+      table_display <- data.frame(PC = projected.userdata()$PC, Var.Delta = projected.userdata()$Var.Delta, Delta = projected.userdata()$Delta, P = projected.userdata()$P, Trait = projected.userdata()$Trait, stringsAsFactors = F) %>% arrange(P)
       table_display$Var.Delta <- sprintf("%.4e", table_display$Var.Delta)
       table_display$Delta <- sprintf("%.4e", table_display$Delta)
       table_display$P <- sprintf("%.2e", table_display$P)
       table_display
-    ## This is used for the DT output, currently commented
-    # %>% datatable(projected.userdata()) %>% 
-    #   formatRound(c("delta", "z"), digits = 4) %>% # Removed proj from here
-    #   formatSignif(c("var.delta", "p.overall", "p"), digits = 4) # Changed var.proj to var.delta
-    ##########
   }, width = '100%'
     )
   
@@ -326,7 +331,12 @@ server <- function(input, output, session) {
   output$downloadTable <- downloadHandler(
       filename = c('PCDelta_table.csv'),
       content = function(file) {
-      write.csv(projected.userdata(), file, row.names=FALSE)}
+       if(input$downloadfulldata){
+          write.csv(full_data(), file, row.names = FALSE, quote = FALSE)
+        }else{
+          write.csv(projected.userdata()[, c("PC", "Var.Delta", "Delta", "P", "Trait")], file, row.names=FALSE, quote = FALSE)
+        }
+     }
   )
   ### Display QC table
   output$QCtable <- renderTable({
