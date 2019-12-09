@@ -71,7 +71,7 @@ ui <- fluidPage(
                    tabsetPanel(
                      tabPanel("About", column(12, includeMarkdown("about.md"))),
                      
-                     textInput("selectstage", label="", value="stageuploaddata", width='300px') # For some reason this line is crucial for the whole app to work properly
+                     textInput("selectstage", label="", value="stageuploaddata", width='1px') # For some reason this line is crucial for the whole app to work properly
                    )),
       h3(" "),
 
