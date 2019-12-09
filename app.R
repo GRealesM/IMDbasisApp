@@ -12,7 +12,6 @@ library(dplyr)
 library(knitr)
 library(R.utils)
 library(data.table)
-library(DT)
 library(cupcake)
 
 ###########################################################################

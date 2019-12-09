@@ -50,7 +50,6 @@ R  | Language and environment for statistical computing and graphics
 BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake.
 cupcake | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake)
 data.table | Fast aggregation of large data, among other functions
-DT | A Wrapper of the JavaScript Library 'DataTables'. It helps rendering the PCA table for visualization
 dplyr  | A fast, consistent tool for working with data frame like objects, both in memory and out of memory
 knitr  | Tool for dynamic report generation in R
 R.utils | Utility functions useful when programming and developing R packages, dependency of cupcake and/or annotSnpStats packages
