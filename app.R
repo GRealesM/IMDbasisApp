@@ -13,7 +13,7 @@ library(data.table)
 library(cupcake)
 
 SNP.manifest <- copy(cupcake::SNP.manifest)
-TITLE <- ' IMD cupcake '
+TITLE <- ' IMD Basis App '
 ## Header key
 header_key <- c(chr = "CHR",
                 pos = "POS",
@@ -30,7 +30,9 @@ header_key <- c(chr = "CHR",
 ###########################################################################
 
 ui <- bootstrapPage(
-  titlePanel(TITLE,windowTitle = TITLE),
+  fluidPage( 
+    column = 3, offset = 4, titlePanel(TITLE, windowTitle = TITLE)
+    ),
   sidebarLayout(
     sidebarPanel(
         wellPanel(p("This shiny application allows you to project your GWAS summary statistics onto a lower dimensional basis that summarises the genetic architectures of 13 common immune-mediated diseases. For a more detailed explanation please see the 'help' tab on the right hand side.")),

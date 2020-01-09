@@ -1,5 +1,5 @@
 
-# IMD cupcake
+# IMD Basis App
 
 #### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis
 

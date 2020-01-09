@@ -72,7 +72,7 @@ There is no requirement for a GWAS to be performed on a particular genotyping pl
   
 # Example file
 
-We included a filtered dataset that serves as a default dataset to showcase what should be expected when inputting your own data.
+We included a filtered dataset that serves as a default dataset to showcase what should be expected when inputting your own data. You can download this example dataset [here](https://github.com/GRealesM/AutobasisApp/blob/master/data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv).
 This dataset correspond to a GWAS of C-X-C motif chemokine 10, Interferon gamma-induced protein 10 (CXCL10, IP-10) levels, published by Aholla-Olli et al., 2017 ([10.1016/j.ajhg.2016.11.007](https://doi.org/10.1016/j.ajhg.2016.11.007)), and publicly available at [GWAS Catalogue](http://computationalmedicine.fi/data#Cytokine_GWAS).
 
 This is an example of dataset format that *should* work:
