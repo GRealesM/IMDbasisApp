@@ -4,10 +4,10 @@
 # LOAD REQUIRED LIBRARIES AND SET REPOSITORIES
 ###########################################################################
 
-library(BiocManager)
-options(repos = BiocManager::repositories())
 library(shiny)
 library(shinyjs)
+library(BiocManager)
+options(repos = BiocManager::repositories())
 library(knitr)
 library(dplyr)
 library(R.utils)
