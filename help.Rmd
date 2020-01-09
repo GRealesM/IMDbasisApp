@@ -93,7 +93,6 @@ knitr::kable(table)
 **Software**   | 
 R  | Language and environment for statistical computing and graphics
 **R packages** |
-annotSnpStats | Simple class to allow SnpMatrix objects to be manipulated together with SNP annotation files. Available at [Github](https://github.com/chr1swallace/annotSnpStats)
 BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake/annotSnpStats
 cupcake | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake)
 data.table | Fast aggregation of large data, among other functions
