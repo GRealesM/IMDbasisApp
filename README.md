@@ -1,9 +1,9 @@
 
-# Autobasis App
+# IMD cupcake
 
 #### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis
 
-Updated: 09/12/2019
+Updated: 09/01/2020
 
 **Note:** This is a beta version. Some important features and
 compatibility with some data formats and builds will be surely missing,
@@ -11,7 +11,7 @@ but will be implemented in future versions
 
 ### Purpose
 
-**AutobasisApp** is a **Shiny** web application that allows users to
+A **Shiny** web application that allows users to
 project their own GWAS summary statistics data onto a 13 Immune-mediated
 disease (IMD) basis. The application uses a Bayesian shrinkage approach
 (contained in the `cupcake` package) to perform a disease-focused
@@ -80,7 +80,7 @@ message.
 
 ### Dependencies
 
-**AutobasisApp** has been developed using **R** and **Shiny** and is
+This application has been developed using **R** and **Shiny** and is
 dependent on the following software and **R**
 packages:
 
@@ -89,7 +89,6 @@ packages:
 | **Software**   |                                                                                                                                              |
 | R              | Language and environment for statistical computing and graphics                                                                              |
 | **R packages** |                                                                                                                                              |
-| BiocManager    | Provides tools for managing Bioconductor’s package versioning and release system. Dependency of cupcake/annotSnpStats                        |
 | cupcake        | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake) |
 | data.table     | Fast aggregation of large data, among other functions                                                                                        |
 | dplyr          | A fast, consistent tool for working with data frame like objects, both in memory and out of memory                                           |
@@ -99,23 +98,14 @@ packages:
 
 ### Citation
 
-To cite **AutobasisApp** in publications, please use:
+To cite this application, please use:
 
-  - Burren O (2020) “Characterisation of the genetic architecture of
+  - Burren OS *et al.* (2020) “Characterisation of the genetic architecture of
     immune mediated disease through informed dimension reduction allows
     the separation of clinical subtypes” *Manuscript in preparation*
 
 ### Development
 
-**AutobasisApp** has been developed within the [**Wallace
+This application has been developed within the [**Wallace
 Group**](https://chr1swallace.github.io) and funded by the **Wellcome
-Trust**.
-
-Guillermo Reales  
-Posdoctoral Associate at Wallace Group  
-Department of Medicine  
-University of Cambridge  
-Cambridge, CB2 0AW, United Kingdom  
-E-mail: <gr440@cam.ac.uk>  
-URL: <https://chr1swallace.github.io>; <http://github.com/GRealesM>  
-Twitter: @GReales7
+Trust** by Guillermo Reales and Olly Burren.
