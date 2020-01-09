@@ -1,4 +1,4 @@
-#### AutobasisApp #####
+#### IMDbasisApp #####
 
 ###########################################################################
 # LOAD REQUIRED LIBRARIES AND SET REPOSITORIES
