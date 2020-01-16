@@ -35,7 +35,16 @@ header_key <- c(chr = "CHR",
 ui <- bootstrapPage(
   fluidPage( 
     column = 3, offset = 4,  
-    tags$head(includeScript("google-analytics.js")),
+    tags$div(
+      HTML('<!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=UA-134236872-2"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag("js", new Date());
+  gtag("config", "UA-134236872-2");
+</script>')
+    ),
     titlePanel(TITLE, windowTitle = TITLE)
     ),
   sidebarLayout(
