@@ -1,4 +1,10 @@
-#  Introduction
+---
+title: "Help document"
+output: html_document
+#runtime: shiny_prerendered
+---
+
+##  Introduction
 
 Understanding the aetiological relationships between multiple (>2) complex diseases can provide insights into shared pathogenic themes which can then be used to inform therapeutic intervention. However, this has proved challenging for a number of reasons. In our paper **'Characterisation of the genetic architecture of immune mediated disease through informed dimension reduction'**, we expand on these challenges and describe a novel approach *cupcake* that seeks to overcome them. In the paper we propose a statistical framework that allows the creation of a lower-dimensional basis that summarises the sharing of genetic risk across a set of clinically related diseases. Using publicly available GWAS summary stats we apply the framework to the study of immunme-mediated disease (IMD) to create an IMD specific basis. This software allows a user to upload their own GWAS summary data and project onto this basis. We evisage four main scenarios where this might be useful:
 
@@ -8,14 +14,14 @@ Understanding the aetiological relationships between multiple (>2) complex disea
 4. You want to assess the genetic architecture of a trait in the general context of IMD, this can be useful, for example, in describing the differences between clinically related subtypes of disease.
 
 
-# Methodology
+## Methodology
 
 A  detailed account of the methodology is available in the paper but here is a brief explanation aimed at broad audience. Assessing the shared genetic architecture for more than two traits is challenging, the number of variants assayed in a GWAS is often in the millions which quickly makes useful comparisons problematic. One approach is dimension reduction; here we make sure that effect sizes (odds ratios) for each disease are with respect to the same allele and then arrange them in a large matrix. We can then perform standard principal component analysis (PCA) on this matrix to create lower-dimensional summaries of the shared and distinct genetic architectures of the input diseases creating a object called a **basis**. Unfortunately this naive approach does not work, the relationships that we are interested in are obscured by other phenomena such as linkage disequillibrium, study heterogeneity (e.g. sample size)  and variant allele frequencies. To overcome this we adapt strategies from genetic fine mapping to train a Bayesian "lens" to focus our attention only on the disease-associated fraction of the genome. We can then apply the lens to matrix of disease variant effect sizes and use this perform PCA and successfully elucidate components of shared genetic risk. 
 
 This lens can be applied to external GWAS datasets, and these reweighted effect sizes can be projected onto this **basis** and their location with basis-space observed. We developed a method to assess whether the location of a projected trait within basis-space is significantly different from what would be expected under the null, thus enabling the kinds of analyses detailed in the introduction.  
 
 
-# How to use this tool
+## How to use this tool
 
 Given our focus on the IMD-associated fraction of the genome the basis only require a small subset of variants. The tool itself will attempt to filter uploaded files of GWAS summary statistics to include only these variants, however please note that files greater than 200Mb cannot be accommodated. To upload your own file click the **Upload** button in the *Upload your data* panel on the left hand size and follow the on screen dialogue. To label your trait on subsequent plots fill in the text box labelled **Trait name**.
 
@@ -27,11 +33,11 @@ Subject to  various checks that are carried out on the uploaded file, the panel 
 
 After your data has been sucessfully projected you will have access to two further tabs on the right hand side. 
 
-### Plot
+#### Plot
 
 This is a forest plot that shows for a principal component selected from the control panel on the left. The objective of this plot is for a user to be able to assess whether their traits location for a specific component significantly deviates from baseline and how these relate to traits used to create the basis. To create the baseline, we include a synthetic disease for which all variants have an effect size of zero. Using the example file for IP-10 cytokine concentration, we can see that for PC1 it lies to the left and therefore looks more similar to basis diseases of a more autoimmune rather than autoinflammtory nature. A button **Download plot** allows you to download the current plot as a PDF.
 
-### Table
+#### Table
 
 This table gives the full results for your trait across all components. 
 
@@ -44,7 +50,7 @@ This table gives the full results for your trait across all components.
 For further details on these and their statistical derivations please see our paper. A button **Download table** allows you to download the current table as a csv file. The checkbox **Include basis traits in download** if selected means that **Delta** values for basis traits are also included. **Note** as these traits are used to create the basis they do not have a **Var.Delta** or **P** associated with them. This tabularised data can be useful for your own analyses and plots for example it can be used to create dendrograms of overall disease architectures. See this [vignette](https://chr1swallace.github.io/cupcake/articles/create-basis.html) for further details.  
 
 
-###  GWAS summary file requirements
+####  GWAS summary file requirements
 
 In order to analyze your own data, you must provide a GWAS summary statistics file with the following format:
 
@@ -62,29 +68,29 @@ In order to analyze your own data, you must provide a GWAS summary statistics fi
     - **BETA** (log OR) *or* **OR**
     - **P** (P-value)
       
-### Aligning effect sizes 
+#### Aligning effect sizes 
 
 It is important that the effect sizes (OR/BETA) for projected traits are with respect to the same allele. Currently we assume that the effect is with respect to the ALT allele. Thus prior to uploading please ensure that REF and ALT alleles for your study match the basis and that all effect sizes are with respect to the ALT allele. Further details on how to do this are available [here](https://chr1swallace.github.io/cupcake/articles/project-basis.html).
 
-### Missing data
+#### Missing data
 
 There is no requirement for a GWAS to be performed on a particular genotyping platform or to have undergone imputation and the variants used by the basis are those that are commonly available across the major platforms (in the paper we demonstrate this has no real effect on the resultant basis), however due to study design some variants may be missing. We provide an **uploaded file overview** panel that shows various metrics for the uploaded file. If you notice the **Uploaded SNPs overlapping basis** is below 95% resultant analysis may be compromised - see the paper for further details.      
   
-# Example file
+## Example file
 
-We included a filtered dataset that serves as a default dataset to showcase what should be expected when inputting your own data. You can download this example dataset [here](https://github.com/GRealesM/AutobasisApp/blob/master/data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv).
-This dataset correspond to a GWAS of C-X-C motif chemokine 10, Interferon gamma-induced protein 10 (CXCL10, IP-10) levels, published by Aholla-Olli et al., 2017 ([10.1016/j.ajhg.2016.11.007](https://doi.org/10.1016/j.ajhg.2016.11.007)), and publicly available at [GWAS Catalogue](http://computationalmedicine.fi/data#Cytokine_GWAS).
+We included a filtered dataset that serves as a default dataset to showcase what should be expected when inputting your own data. You can download this example dataset [here](https://raw.githubusercontent.com/GRealesM/IMDbasisApp/master/data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv).
+This dataset correspond to a GWAS of C-X-C motif chemokine 10, Interferon gamma-induced protein 10 (CXCL10, IP-10) levels, published by Aholla-Olli et al., 2017 ([10.1016/j.ajhg.2016.11.007](https://doi.org/10.1016/j.ajhg.2016.11.007)), and publicly available at [GWAS Catalog] (https://www.ebi.ac.uk/gwas/efotraits/EFO_0008056) or [here](http://computationalmedicine.fi/data#Cytokine_GWAS).
 
 This is an example of dataset format that *should* work:
 
-```{r, eval=TRUE, echo=FALSE}
+```{r, eval=TRUE, echo=FALSE, context = "data"}
 sample_dataset <- data.table::fread("data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv")
 table <- head(sample_dataset)
-knitr::kable(table)
+kableExtra::kable_styling(knitr::kable(table, format = "html"), "striped", full_width = F)
 ```
 
 
-# Dependencies
+## Dependencies
 
 **AutobasisApp** has been developed using **R** and **Shiny** and is dependent on the following software and **R** packages:
 
@@ -103,14 +109,14 @@ R.utils | Utility functions useful when programming and developing R packages, d
 shiny  | Web Application Framework for R
 
 
-# Citation
+## Citation
 
 To cite this application, please use:
 
 - Burren OS *et al.* (2020) "Characterisation of the genetic architecture of immune mediated disease through informed dimension reduction allows the separation of clinical subtypes" *Manuscript in preparation*
 
 
-# About
+## About
 
 This software has been developed by Guillermo Reales (gr440 [at] cam [dot] ac [dot] uk) and Olly Burren (ob219 [at] cam [dot] ac [dot] uk) within the  [**Wallace
 Group**](https://chr1swallace.github.io) and funded by the **Wellcome

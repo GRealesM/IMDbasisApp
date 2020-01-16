@@ -13,6 +13,7 @@ library(dplyr)
 library(R.utils)
 library(data.table)
 library(cupcake)
+library(kableExtra)
 
 SNP.manifest <- copy(cupcake::SNP.manifest)
 TITLE <- ' IMD Basis App '
@@ -33,7 +34,9 @@ header_key <- c(chr = "CHR",
 
 ui <- bootstrapPage(
   fluidPage( 
-    column = 3, offset = 4, titlePanel(TITLE, windowTitle = TITLE)
+    column = 3, offset = 4,  
+    tags$head(includeScript("google-analytics.js")),
+    titlePanel(TITLE, windowTitle = TITLE)
     ),
   sidebarLayout(
     sidebarPanel(
@@ -42,8 +45,10 @@ ui <- bootstrapPage(
         helpText("Upload files in .txt, .csv, .tsv. Compressed files (e.g. .txt.gz) are also accepted"),
         fileInput("user_data", "", accept = c(".txt", ".csv", ".tsv", ".txt.gz", ".tsv.gz", ".csv.gz"), multiple = F),
         textInput("trait_name", "Trait name", "IP-10"),
-        textOutput("checkfile")),
-        selectInput("PCDelta","Principal component", paste('PC',1:13,sep=''),selected='PC1',width="30%"),
+        textOutput("checkfile"),
+        a(strong("Download example dataset"), href="https://raw.githubusercontent.com/GRealesM/IMDbasisApp/master/data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv")
+        ),
+        selectInput("PCDelta","Principal component", paste('PC',1:13,sep=''),selected='PC1'),
         wellPanel(h3("Uploaded data overview"),tableOutput("QCtable"))
     ),
     
@@ -53,10 +58,10 @@ ui <- bootstrapPage(
         tabPanel("Table", wellPanel(
                                     verticalLayout(tableOutput("table"),
                                         flowLayout(
-                                        downloadButton(outputId = "downloadTable",label = "Download table"),
+                                         downloadButton(outputId = "downloadTable",label = "Download table"),
                                         checkboxInput(inputId = "downloadfulldata", label = "Include basis traits in download", value = FALSE))
                                     ))), 
-        tabPanel("Help", column(12, includeMarkdown("help.Rmd")))
+        tabPanel("Help", column(12, HTML(markdown::markdownToHTML(knit("help.Rmd", quiet = TRUE)))))
       )
     )
   )

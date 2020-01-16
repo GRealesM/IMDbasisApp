@@ -3,7 +3,7 @@
 
 #### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis
 
-Updated: 09/01/2020
+Updated: 15/01/2020
 
 **Note:** This is a beta version. Some important features and
 compatibility with some data formats and builds will be surely missing,
