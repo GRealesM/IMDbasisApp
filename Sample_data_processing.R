@@ -3,9 +3,47 @@
 ## Date of creation: 2019-11-25
 
 library(cupcake)
-library(annotSnpStats)
 library(data.table)
 library(magrittr)
+
+
+### Load helper functions
+
+### g.complement, as found in annotSnpStats package (github.com/chr1swallace/annotSnpStats/)
+g.complement <- function (x) {
+  x <- toupper(x)
+  switches <- c(A = "t", T = "a", C = "g", G = "c")
+  for (i in seq_along(switches)) x <- sub(names(switches)[i], switches[i], x)
+  toupper(x)
+}
+
+### g.rev, as found in annotSnpStats package (github.com/chr1swallace/annotSnpStats/)
+g.rev <- function (x, sep = "/") {
+  sapply(strsplit(x, sep), function(g) paste(rev(g), collapse = "/"))
+}
+
+### g.class, as found in annotSnpStats package (github.com/chr1swallace/annotSnpStats/)
+g.class <- function (x, y) {
+  if (!identical(names(x), names(y))) 
+    stop("x and y must relate to same SNPs")
+  mat <- matrix(FALSE, length(x), 4, dimnames = list(names(x), c("nochange", "rev", "comp", "revcomp")))
+  mat[, "nochange"] <- x == y
+  mat[, "rev"] <- x == g.rev(y)
+  mat[, "comp"] <- x == g.complement(y)
+  mat[, "revcomp"] <- x == g.rev(g.complement(y))
+  indels <- x %in% c("I/D", "D/I")
+  if (any(indels)) 
+    mat[indels, c("comp", "revcomp")] <- FALSE
+  ret <- character(nrow(mat))
+  rs <- rowSums(mat)
+  if (length(wh <- which(rs > 1))) 
+    ret[wh] <- "ambig"
+  if (length(wh <- which(rs == 0))) 
+    ret[wh] <- "impossible"
+  if (length(wh <- which(rs == 1))) 
+    ret[wh] <- colnames(mat)[apply(mat[wh, , drop = FALSE], 1, which)]
+  return(ret)
+}
 
 #### Load data sets contained at Cupcake ####
 data(burren_imd_13_traits)

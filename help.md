@@ -81,7 +81,7 @@ In order to analyze your own data, you must provide a GWAS summary statistics fi
     - **BETA** (log OR) *or* **OR**
     - **P** (P-value)
       
-**A side note on SNPs and file size**: This App caps the maximum uploaded file size at **200MB**, which might be too small for most current GWAS summary statistics dataset. Our method focuses on 566 SNPs for projection only, which means that if you filter your dataset to contain only those 566 SNPs you'll obtain the same results - and it will run faster! 
+**A side note on SNPs and file size**: This App caps the maximum uploaded file size at **200MB**, which might be too small for most current GWAS summary statistics datasets. Our method focuses on 566 SNPs for projection only, which means that if you filter your dataset to contain only those 566 SNPs you'll obtain the same results - and it will run faster! 
 You can get the list of SNPs by downloading the example dataset, and a detailed explanation of how we chose those 566 SNPs in the publication (see Citation below).
 
 ### Aligning effect sizes 
@@ -179,7 +179,7 @@ This is an example of dataset format that *should* work:
 
 ## Dependencies
 
-**IMDbasisApp** has been developed using **R** and **Shiny** and is dependent on the following software and **R** packages:
+**IMD basis App** has been developed using **R** and **Shiny** and is dependent on the following software and **R** packages:
 
 |  |   |
 --- | ----
@@ -195,7 +195,7 @@ knitr  | Tool for dynamic report generation in R
 R.utils | Utility functions useful when programming and developing R packages, dependency of cupcake and/or annotSnpStats packages
 shiny  | Web Application Framework for R
 
-## Data treatment and privacy statement
+## Data privacy statement
 
 IMD basis App can use user-supplied data, but it does not store or shares them with any third party, and it deletes all data after being closed by the user. It will do so too if the server automatically closes the connection due to idle time (usually 5 minutes). This is the default behaviour of Shiny Apps hosted in ShinyApps.io (See [here](https://docs.rstudio.com/shinyapps.io/Storage.html)). Users can also check our [source code](https://github.com/GRealesM/IMDbasisApp).
 In case of further privacy concerns, we refer the user to perform projections locally using our [cupcake package](https://github.com/ollyburren/cupcake), which applies the same method as the IMD basis App.

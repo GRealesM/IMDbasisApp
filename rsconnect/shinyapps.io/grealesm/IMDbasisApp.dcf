@@ -1,0 +1,13 @@
+name: IMDbasisApp
+title: IMDbasisApp
+username:
+account: grealesm
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 1640567
+bundleId: 3478818
+url: https://grealesm.shinyapps.io/IMDbasisApp/
+when: 1596646403.97763
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: help.md|README.md|Sample_data_processing.R

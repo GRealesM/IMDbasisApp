@@ -7,7 +7,9 @@ Updated: 05/08/2020
 
 **Note:** This is a beta version. Some important features and
 compatibility with some data formats and builds will be surely missing,
-but will be implemented in future versions
+but will be implemented in future versions.
+
+IMD Basis App can be accessed at: https://grealesm.shinyapps.io/IMDbasisApp/
 
 ##  Introduction
 
@@ -114,7 +116,7 @@ work:
 **Software**   | 
 R  | Language and environment for statistical computing and graphics
 **R packages** |
-BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake/annotSnpStats
+BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake/snpStats.
 cupcake | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake)
 data.table | Fast aggregation of large data, among other functions
 DT | A Wrapper of the JavaScript Library 'DataTables'. It helps rendering the PCA table for visualization
