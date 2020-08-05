@@ -1,13 +1,17 @@
+---
+title: "Help document"
+output: html_document
+#runtime: shiny_prerendered
+---
 
-# IMD Basis App
+[//]: # (This chunk is necessary to guarantee the app will rescale with different window sizes.)
 
-#### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis
-
-Updated: 05/08/2020
-
-**Note:** This is a beta version. Some important features and
-compatibility with some data formats and builds will be surely missing,
-but will be implemented in future versions
+<style type="text/css">
+           body {          
+           max-width:100%;
+           padding:0;
+           }
+</style>
 
 ##  Introduction
 
@@ -77,7 +81,7 @@ In order to analyze your own data, you must provide a GWAS summary statistics fi
     - **BETA** (log OR) *or* **OR**
     - **P** (P-value)
       
-**A side note on SNPs and file size**: This App caps the maximum uploaded file size at **200MB**, which might be too small for most current GWAS summary statistics datasets. Our method focuses on 566 SNPs for projection only, which means that if you filter your dataset to contain only those 566 SNPs you'll obtain the same results - and it will run faster! 
+**A side note on SNPs and file size**: This App caps the maximum uploaded file size at **200MB**, which might be too small for most current GWAS summary statistics dataset. Our method focuses on 566 SNPs for projection only, which means that if you filter your dataset to contain only those 566 SNPs you'll obtain the same results - and it will run faster! 
 You can get the list of SNPs by downloading the example dataset, and a detailed explanation of how we chose those 566 SNPs in the publication (see Citation below).
 
 ### Aligning effect sizes 
@@ -93,21 +97,89 @@ There is no requirement for a GWAS to be performed on a particular genotyping pl
 We included a filtered dataset that serves as a default dataset to showcase what should be expected when inputting your own data. You can download this example dataset [here](https://raw.githubusercontent.com/GRealesM/IMDbasisApp/master/data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv).
 This dataset correspond to a GWAS of C-X-C motif chemokine 10, Interferon gamma-induced protein 10 (CXCL10, IP-10) levels, published by Aholla-Olli et al., 2017 ([10.1016/j.ajhg.2016.11.007](https://doi.org/10.1016/j.ajhg.2016.11.007)), and publicly available at [GWAS Catalog] (https://www.ebi.ac.uk/gwas/efotraits/EFO_0008056) or [here](http://computationalmedicine.fi/data#Cytokine_GWAS).
 
-This is an example of dataset format that *should*
-work:
+This is an example of dataset format that *should* work:
 
-| SNP\_ID    | CHR |       POS | REF | ALT |     BETA |     SE |      P |
-| :--------- | --: | --------: | :-- | :-- | -------: | -----: | -----: |
-| rs11190140 |  10 | 101291593 | T   | C   | \-0.0016 | 0.0233 | 0.9422 |
-| rs11195128 |  10 | 112186148 | C   | T   | \-0.0049 | 0.0247 | 0.8415 |
-| rs3814231  |  10 | 115481018 | C   | T   |   0.0007 | 0.0261 | 0.9782 |
-| rs3793910  |  10 | 131562993 | G   | T   | \-0.0100 | 0.0421 | 0.7975 |
-| rs10829131 |  10 |  27177245 | A   | G   |   0.0284 | 0.0350 | 0.4136 |
-| rs11008080 |  10 |  30802799 | A   | C   |   0.0069 | 0.0246 | 0.7694 |
+<table class="table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> SNP_ID </th>
+   <th style="text-align:right;"> CHR </th>
+   <th style="text-align:right;"> POS </th>
+   <th style="text-align:left;"> REF </th>
+   <th style="text-align:left;"> ALT </th>
+   <th style="text-align:right;"> BETA </th>
+   <th style="text-align:right;"> SE </th>
+   <th style="text-align:right;"> P </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> rs11190140 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 101291593 </td>
+   <td style="text-align:left;"> T </td>
+   <td style="text-align:left;"> C </td>
+   <td style="text-align:right;"> -0.0016 </td>
+   <td style="text-align:right;"> 0.0233 </td>
+   <td style="text-align:right;"> 0.9422 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> rs11195128 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 112186148 </td>
+   <td style="text-align:left;"> C </td>
+   <td style="text-align:left;"> T </td>
+   <td style="text-align:right;"> -0.0049 </td>
+   <td style="text-align:right;"> 0.0247 </td>
+   <td style="text-align:right;"> 0.8415 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> rs3814231 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 115481018 </td>
+   <td style="text-align:left;"> C </td>
+   <td style="text-align:left;"> T </td>
+   <td style="text-align:right;"> 0.0007 </td>
+   <td style="text-align:right;"> 0.0261 </td>
+   <td style="text-align:right;"> 0.9782 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> rs3793910 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 131562993 </td>
+   <td style="text-align:left;"> G </td>
+   <td style="text-align:left;"> T </td>
+   <td style="text-align:right;"> -0.0100 </td>
+   <td style="text-align:right;"> 0.0421 </td>
+   <td style="text-align:right;"> 0.7975 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> rs10829131 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 27177245 </td>
+   <td style="text-align:left;"> A </td>
+   <td style="text-align:left;"> G </td>
+   <td style="text-align:right;"> 0.0284 </td>
+   <td style="text-align:right;"> 0.0350 </td>
+   <td style="text-align:right;"> 0.4136 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> rs11008080 </td>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:right;"> 30802799 </td>
+   <td style="text-align:left;"> A </td>
+   <td style="text-align:left;"> C </td>
+   <td style="text-align:right;"> 0.0069 </td>
+   <td style="text-align:right;"> 0.0246 </td>
+   <td style="text-align:right;"> 0.7694 </td>
+  </tr>
+</tbody>
+</table>
+
 
 ## Dependencies
 
-**IMD basis App** has been developed using **R** and **Shiny** and is dependent on the following software and **R** packages:
+**IMDbasisApp** has been developed using **R** and **Shiny** and is dependent on the following software and **R** packages:
 
 |  |   |
 --- | ----

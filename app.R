@@ -49,10 +49,11 @@ ui <- bootstrapPage(
     ),
   sidebarLayout(
     sidebarPanel(
-        wellPanel(p("This shiny application allows you to project your GWAS summary statistics onto a lower dimensional basis that summarises the genetic architectures of 13 common immune-mediated diseases. For a more detailed explanation please see the 'help' tab on the right hand side.")),
+        wellPanel(p("This shiny application allows you to project your GWAS summary statistics onto a lower dimensional basis that summarises the genetic architectures of 13 common immune-mediated diseases. For a more detailed explanation please see the 'Help' tab on the right hand side.")),
         wellPanel(h3("Upload your data"),
         helpText("Upload files in .txt, .csv, .tsv. Compressed files (e.g. .txt.gz) are also accepted"),
         fileInput("user_data", "", accept = c(".txt", ".csv", ".tsv", ".txt.gz", ".tsv.gz", ".csv.gz"), multiple = F),
+        selectInput("population","Select population", c('EUR (European)', 'AFR (African)', 'EAS (East Asian)', 'SAS (South Asian)', 'AMR (admixed American)'),selected='EUR (European)'),
         textInput("trait_name", "Trait name", "IP-10"),
         textOutput("checkfile"),
         a(strong("Download example dataset"), href="https://raw.githubusercontent.com/GRealesM/IMDbasisApp/master/data/Sample_dataset_B004_Ahola-Olli_27989323_1.tsv")
@@ -92,6 +93,9 @@ server <- function(input, output, session) {
       )
       PCDelta <- reactive({
         input$PCDelta
+      })
+      population <- reactive({
+        input$population
       })
 
 ###########################################################################
@@ -190,13 +194,21 @@ server <- function(input, output, session) {
 # Project data onto the basis
 ###########################################################################
 
-    projected.userdata <- function(){
+    
+    projected.userdata <- reactive({
+        
+        # Assign LD matrix depending on selected population
+        newLD <- readRDS(paste0("data/",strsplit(population(), split = " ")[[1]][1],".RDS"))
+        unlockBinding("LD", as.environment("package:cupcake"))
+        assign("LD", newLD, as.environment("package:cupcake"))
+        lockBinding("LD", as.environment("package:cupcake"))
+        
         projected.userdata <- cupcake::project_sparse(beta=M()$BETA, seb=M()$SE, pid=M()$pid)[,trait:=input$trait_name][]
         projected.userdata[, proj:=NULL] # Removed proj variable
         setnames(projected.userdata, c("var.proj", "delta", "p", "trait"), c("Var.Delta", "Delta", "P", "Trait")) # Changed var.proj to var.delta
         setcolorder(projected.userdata, c("PC", "Var.Delta", "Delta", "p.overall", "z", "P", "Trait")) # Removed Proj from here too
         return(projected.userdata)
-    }
+    })
   
   # We extract the projected PCs and combine them with basis PC matrix, so we have a PC matrix that we can use for plotting
     combined.pcs <- function(){
