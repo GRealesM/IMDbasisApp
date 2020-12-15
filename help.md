@@ -15,7 +15,7 @@ output: html_document
 
 ##  Introduction
 
-Understanding the aetiological relationships between multiple (>2) complex diseases can provide insights into shared pathogenic themes which can then be used to inform therapeutic intervention. However, this has proved challenging for a number of reasons. In our paper [**'Informed dimension reduction of clinically-related genome-wide association summary data characterises cross-trait axes of genetic risk'**](https://www.biorxiv.org/content/10.1101/2020.01.14.905869v3), we expand on these challenges and describe a novel approach *cupcake* that seeks to overcome them. In the paper we propose a statistical framework that allows the creation of a lower-dimensional basis that summarises the sharing of genetic risk across a set of clinically related diseases. Using publicly available GWAS summary stats we apply the framework to the study of immune-mediated disease (IMD) to create an IMD specific basis. This software allows a user to upload their own GWAS summary data and project onto this basis. We envisage four main scenarios where this might be useful:
+Understanding the aetiological relationships between multiple (>2) complex diseases can provide insights into shared pathogenic themes which can then be used to inform therapeutic intervention. However, this has proved challenging for a number of reasons. In our paper [**'Genetic feature engineering enables characterisation of shared risk factors in immune-mediated diseases'**](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-020-00797-4), we expand on these challenges and describe a novel approach *cupcake* that seeks to overcome them. In the paper we propose a statistical framework that allows the creation of a lower-dimensional basis that summarises the sharing of genetic risk across a set of clinically related diseases. Using publicly available GWAS summary stats we apply the framework to the study of immune-mediated disease (IMD) to create an IMD specific basis. This software allows a user to upload their own GWAS summary data and project onto this basis. We envisage four main scenarios where this might be useful:
 
 1. You want to understand if a trait shares a common genetic risk component with IMD.
 2. You suspect your trait or traits might have a genetic relationship/shared aetiology with a particular set of IMDs but you require robust evidence.
@@ -186,7 +186,7 @@ This is an example of dataset format that *should* work:
 **Software**   | 
 R  | Language and environment for statistical computing and graphics
 **R packages** |
-BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake/annotSnpStats
+BiocManager | Provides tools for managing Bioconductor's package versioning and release system. Dependency of cupcake/snpStats
 cupcake | Provides a set of functions that makes GWAS summary statistics amenable to PCA. Available at [Github](https://github.com/ollyburren/cupcake)
 data.table | Fast aggregation of large data, among other functions
 DT | A Wrapper of the JavaScript Library 'DataTables'. It helps rendering the PCA table for visualization
@@ -204,7 +204,7 @@ In case of further privacy concerns, we refer the user to perform projections lo
 
 To cite this application, please use:
 
-- Burren OS *et al.* (2020) "Informed dimension reduction of clinically-related genome-wide association summary data characterises cross-trait axes of genetic risk" *bioRxiv*. doi:[10.1101/2020.01.14.905869](https://www.biorxiv.org/content/10.1101/2020.01.14.905869v3).
+- Burren OS *et al.* (2020) "Genetic feature engineering enables characterisation of shared risk factors in immune-mediated diseases" *Genome Med*. 12. 106. doi:[10.1186/s13073-020-00797-4](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-020-00797-4).
 
 
 ## About

@@ -3,7 +3,7 @@
 
 #### A Shiny App for projecting your own GWAS data onto the 13-Immune-mediated-trait basis
 
-Updated: 05/08/2020
+Updated: 15/12/2020
 
 **Note:** This is a beta version. Some important features and
 compatibility with some data formats and builds will be surely missing,
@@ -34,7 +34,7 @@ Given our focus on the IMD-associated fraction of the genome the basis only requ
 
 To improve accuracy, we have now included the possibility to choose the broad ancestry group of the population that was used in your GWAS (**Select population** menu), and use different LD matrices, tailored to the following populations: Admixed American, African, East Asian, European, and South Asian. We computed such matrices using data from 1000 Genomes Project Phase III. See [here](https://www.internationalgenome.org/faq/which-populations-are-part-your-study/) for more details about specific populations used to generate the matrices. Note that LD matrices are used to calculate delta P-values and confidence intervals, so matrix choice should not affect projection itself.
 
-To label your trait on subsequent plots fill in the text box labelled **Trait name**.
+To label your trait on subsequent plots fill in the text box labeled **Trait name**.
 
 Subject to  various checks that are carried out on the uploaded file, the panel **Uploaded data overview** will become populated.
   - **SNPs in the basis** reports the number of variants in the basis and is mainly a sanity check for us to make sure the you have access to the most up to date basis. 
@@ -134,11 +134,10 @@ In case of further privacy concerns, we refer the user to perform projections lo
 
 To cite this application, please use:
 
-- Burren OS *et al.* (2020) "Informed dimension reduction of clinically-related genome-wide association summary data characterises cross-trait axes of genetic risk" *bioRxiv*. doi:[10.1101/2020.01.14.905869](https://www.biorxiv.org/content/10.1101/2020.01.14.905869v3).
+- Burren OS *et al.* (2020) "Genetic feature engineering enables characterisation of shared risk factors in immune-mediated diseases" *Genome Med*. 12. 106. doi:[10.1186/s13073-020-00797-4](https://genomemedicine.biomedcentral.com/articles/10.1186/s13073-020-00797-4).
 
 
 ## About
 
 This software has been developed by Guillermo Reales (gr440 [at] cam [dot] ac [dot] uk) and Olly Burren (ob219 [at] cam [dot] ac [dot] uk) within the  [**Wallace
-Group**](https://chr1swallace.github.io) and funded by the **Wellcome
-Trust**.
+Group**](https://chr1swallace.github.io) and funded by the **Wellcome Trust**.
